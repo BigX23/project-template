@@ -10,7 +10,7 @@ Based on the successful build system and practices from the **Listo** project, t
 ✅ **100% Test Coverage Goal** - Unit, integration, and E2E tests  
 ✅ **CI/CD Pipeline** - Automated testing and deployment  
 ✅ **Error Tracking** - Production error monitoring  
-✅ **Security Scanning** - Dependency vulnerability checks  
+✅ **Security Scanning** - Dependency vulnerability checks in both local build AND CI  
 ✅ **Accessibility Testing** - WCAG 2.1 AA compliance  
 ✅ **Comprehensive Documentation** - For humans and AI assistants
 
@@ -215,8 +215,9 @@ If instructed to **"implement all incomplete features from UPDATES.md"**:
 Every commit must:
 - ✅ Pass `npm run lint` (0 warnings)
 - ✅ Pass `npm run typecheck` (0 errors)
+- ✅ Pass `npm run audit:high` (no high/critical vulnerabilities)
 - ✅ Pass `npm test` (maintain/increase coverage)
-- ✅ Pass `npm run build` (successful build)
+- ✅ Pass `npm run build` (full pipeline: lint → typecheck → audit → test → build)
 - ✅ Update relevant documentation
 
 ---

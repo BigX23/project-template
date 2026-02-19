@@ -139,9 +139,11 @@ Skip for trivial changes.
 ### 10. Build Verification
 
 - Always run `npm run build` after making changes
-- Build pipeline runs: lint → typecheck → build
+- Build pipeline runs: lint → typecheck → audit:high → test → build
+- **Security audit is part of the build** - high/critical vulnerabilities fail the build
 - Fix all build errors before committing
 - Verify production bundle builds successfully
+- If audit fails, run `npm run audit:fix` to resolve
 
 ---
 

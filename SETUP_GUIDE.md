@@ -1141,30 +1141,48 @@ npm run test:e2e -- accessibility
 
 ## Security Scanning
 
-### 1. Add npm audit Script
+### 1. Add npm audit Scripts
 
 In `package.json`:
 
 ```json
 {
   "scripts": {
-    "audit": "npm audit --audit-level=high",
+    "audit:high": "npm audit --audit-level=high",
     "audit:fix": "npm audit fix"
   }
 }
 ```
 
-### 2. Run Audit
+### 2. Include in Build Script
 
-```bash
-npm run audit
+**Critical:** Security audit must be part of your build process, not just CI:
+
+```json
+{
+  "scripts": {
+    "build": "npm run lint && npm run typecheck && npm run audit:high && npm run test && vite build"
+  }
+}
 ```
 
-Fix any high or critical vulnerabilities.
+This ensures local builds fail the same way CI builds fail - no surprises when pushing code.
 
-### 3. Add to CI Pipeline
+### 3. Run Audit Manually
 
-Already included in the GitHub Actions workflow above.
+```bash
+# Check for vulnerabilities
+npm run audit:high
+
+# Auto-fix what's possible
+npm run audit:fix
+```
+
+Fix any high or critical vulnerabilities before committing.
+
+### 4. Already in CI Pipeline
+
+The GitHub Actions workflows above also include security audit.
 
 ---
 
@@ -1187,7 +1205,8 @@ Run through this checklist to verify everything is set up:
 - [ ] Tests run in CI pipeline
 
 #### Build & Deploy
-- [ ] `npm run build` - Builds successfully
+- [ ] `npm run build` - Full build passes (lint + typecheck + audit + test + build)
+- [ ] `npm run audit:high` - No high/critical vulnerabilities
 - [ ] `npm run build:analyze` - Bundle size acceptable
 - [ ] CI pipeline runs on push
 - [ ] Deployment configured (staging & production)
@@ -1221,7 +1240,8 @@ After setup, your `package.json` should have these scripts:
 {
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "npm run lint && npm run typecheck && npm run audit:high && npm run test && vite build",
+    "build:quick": "tsc && vite build",
     "preview": "vite preview",
     
     "lint": "eslint . --max-warnings 0",
@@ -1239,11 +1259,21 @@ After setup, your `package.json` should have these scripts:
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     
-    "audit": "npm audit --audit-level=high",
-    "build:analyze": "npm run build && open stats.html"
+    "audit:high": "npm audit --audit-level=high",
+    "audit:fix": "npm audit fix",
+    "build:analyze": "npm run build:quick && open stats.html"
   }
 }
 ```
+
+**Important:** The `build` script now runs the full quality pipeline:
+- `lint` - Check code style (ESLint)
+- `typecheck` - Verify TypeScript types
+- `audit:high` - Check for security vulnerabilities (high/critical)
+- `test` - Run unit tests
+- `vite build` - Create production bundle
+
+Use `build:quick` when you need to skip checks during rapid iteration.
 
 ---
 
